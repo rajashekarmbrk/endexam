@@ -1,0 +1,121 @@
+package com.example.examsql.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="students")
+public class Stuentity {
+	
+	@Id
+	private int id;
+	@Column(name="name")
+	private String name;
+	@Column(name="branch")
+	private String branch;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getBranch() {
+		return branch;
+	}
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+	
+
+}
+
+-------------------------------------------------------------------------------------
+package com.example.examsql.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.examsql.entity.Stuentity;
+import com.example.examsql.repo.Sturepo;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+public class Stucontroller {
+	
+	@Autowired
+	public Sturepo obj;
+	
+	@GetMapping("/get")
+	public List<Stuentity> get(){
+		return obj.findAll();
+	}
+	
+	@GetMapping("/csrf")
+	public CsrfToken token(HttpServletRequest rq) {
+		return (CsrfToken) rq.getAttribute("_csrf");
+	}
+	
+	@GetMapping("/get/{id}")
+	public Stuentity get(@PathVariable int id) {
+		return obj.findById(id).orElse(null);
+	}
+	
+	@PostMapping("/post")
+	public String saverecord(Stuentity db) {
+		obj.save(db);
+		return "inserted";
+	}
+	
+	@PutMapping("/put/{id}")
+	public String update(@PathVariable int id,Stuentity ed) {
+		if(obj.existsById(id)) {
+			Stuentity ud=obj.findById(id).get();
+			ud.setName(ed.getName());
+			ud.setBranch(ed.getBranch());
+			obj.save(ud);
+			return "updated";
+		}
+		return "id not found";
+	}
+	
+	@DeleteMapping("/del/{id}")
+	public String deleter(@PathVariable int id) {
+		if(obj.existsById(id)) {
+			obj.deleteById(id);
+			return "deleted";
+		}else {
+			return "id not found";
+		}
+	}
+
+}
+-----------------------------------------------------------------------------------------------------------------------
+spring.datasource.url=jdbc:mysql://localhost:3306/collage
+spring.datasource.username=root
+spring.datasource.password=root
+spring.jpa.hibernate.ddl-auto=update
+spring.security.user.name=user
+spring.security.user.password=1234
+
+-------------------------------------------------------------------------------------------
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+spring.data.mongodb.database=company
+-----------------------------------------------------------------
